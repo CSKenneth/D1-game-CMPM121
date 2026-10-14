@@ -32,7 +32,7 @@ function updateDisplay() {
     const button = upgradeButtons[i];
 
     button.textContent =
-      `${upgrade.owned}x ${upgrade.name} | +${upgrade.amountPerUpgrade} C/s | (cost: ${upgrade.cost} cookies)`;
+      `${upgrade.owned}x ${upgrade.name} | +${upgrade.amountPerUpgrade} C/${upgrade.upgradeType} | (cost: ${upgrade.cost} cookies)`;
     button.disabled = !upgrade.canPurchase(cookieCount);
   }
 }
@@ -78,7 +78,7 @@ class Upgrade {
     public startingCost: number,
     public costIncrease: number,
     public amountPerUpgrade: number,
-    public upgradeType: "click" | "auto",
+    public upgradeType: "click" | "second",
     public applyEffect: (amount: number) => void,
   ) {
     this.cost = startingCost;
@@ -99,9 +99,9 @@ class Upgrade {
 const upgrades: Upgrade[] = [
   new Upgrade("Clicker", 20, 15, 1, "click", addClickPower),
 
-  new Upgrade("AutoClicker", 40, 15, 1, "auto", addGrowth),
+  new Upgrade("AutoClicker", 40, 15, 1, "second", addGrowth),
 
-  new Upgrade("Farm", 80, 25, 5, "auto", addGrowth),
+  new Upgrade("Farm", 80, 25, 5, "second", addGrowth),
 ];
 
 // Create Upgrade Buttons
