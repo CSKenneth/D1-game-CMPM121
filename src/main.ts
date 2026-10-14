@@ -8,28 +8,45 @@ const app = document.querySelector<HTMLElement>("#app")!;
 const heading = document.createElement("h1");
 heading.textContent = "Cookie Clicker Square Edition";
 
-//images
+// Images
 const image = document.createElement("img");
 image.src = tileUrl;
 image.alt = "A teal tile with a cream circle";
 image.width = 96;
 image.height = 96;
 
+const rateText = document.createElement("p");
 const counterText = document.createElement("p");
 counterText.textContent = "Cookies: 0";
 
 // Update Display
 function updateDisplay() {
   counterText.textContent = `Cookies: ${Math.floor(cookieCount)}`;
-  upgradeClickerButton.disabled = cookieCount < clickerUpgradeCost;
-  upgradeAutoClickerButton.disabled = cookieCount < autoClickerUpgradeCost;
+  rateText.textContent = `${
+    cookiesPerSecond.toFixed(1)
+  } cookies/sec | ${cookiesPerClick} cookies per click`;
+
+  // Button text
+  for (let i = 0; i < upgrades.length; i++) {
+    const upgrade = upgrades[i];
+    const button = upgradeButtons[i];
+
+    button.textContent =
+      `${upgrade.owned}x ${upgrade.name} | +${upgrade.amountPerUpgrade} C/s | (cost: ${upgrade.cost} cookies)`;
+    button.disabled = !upgrade.canPurchase(cookieCount);
+  }
 }
 
 // Update Growth Rate
 let cookiesPerSecond = 0;
 function addGrowth(amount: number) {
   cookiesPerSecond += amount;
-  updateDisplay();
+}
+
+// Update Click Power
+let cookiesPerClick = 1;
+function addClickPower(amount: number) {
+  cookiesPerClick += amount;
 }
 
 // Timed Growth
@@ -42,56 +59,69 @@ function tick(now: number) {
 
   requestAnimationFrame(tick); // inside: schedules the next frame
 }
-requestAnimationFrame(tick); // outsite: starts the loop
+requestAnimationFrame(tick); // outside: starts the loop
 
-//Clicker Section
+// Clicker Section
 let cookieCount = 0;
 image.addEventListener("click", () => {
   cookieCount += cookiesPerClick;
   updateDisplay();
 });
 
-// Upgrade Section
+// Upgrade Class
+class Upgrade {
+  owned = 0;
+  cost: number;
 
-//Click Upgrade
-let clickerUpgradeCost = 20;
-let cookiesPerClick = 1;
-const upgradeClickerButton = document.createElement("button");
-upgradeClickerButton.disabled = true;
-upgradeClickerButton.textContent = "Upgrade Clicker Cost: 20 Cookies";
-upgradeClickerButton.addEventListener("click", () => {
-  if (cookieCount >= clickerUpgradeCost) {
-    cookieCount -= clickerUpgradeCost;
-    cookiesPerClick++;
-    clickerUpgradeCost += 15;
-
-    upgradeClickerButton.textContent =
-      `Upgrade Clicker Cost: ${clickerUpgradeCost} Cookies`;
-    updateDisplay();
+  constructor(
+    public name: string,
+    public startingCost: number,
+    public costIncrease: number,
+    public amountPerUpgrade: number,
+    public upgradeType: "click" | "auto",
+    public applyEffect: (amount: number) => void,
+  ) {
+    this.cost = startingCost;
   }
-});
 
-//AutoClicker Upgrade
-let autoClickerUpgradeCost = 40;
-const upgradeAutoClickerButton = document.createElement("button");
-upgradeAutoClickerButton.disabled = true;
-upgradeAutoClickerButton.textContent = "Upgrade AutoClicker Cost: 40 Cookies";
-upgradeAutoClickerButton.addEventListener("click", () => {
-  if (cookieCount >= autoClickerUpgradeCost) {
-    cookieCount -= autoClickerUpgradeCost;
-    addGrowth(1);
-    autoClickerUpgradeCost += 15;
-
-    upgradeAutoClickerButton.textContent =
-      `Upgrade AutoClicker Cost: ${autoClickerUpgradeCost} Cookies`;
-    updateDisplay();
+  purchase() {
+    this.owned++;
+    this.cost += this.costIncrease;
+    this.applyEffect(this.amountPerUpgrade);
   }
-});
+
+  canPurchase(cookies: number): boolean {
+    return cookies >= this.cost;
+  }
+}
+
+// Upgrade data
+const upgrades: Upgrade[] = [
+  new Upgrade("Clicker", 20, 15, 1, "click", addClickPower),
+
+  new Upgrade("AutoClicker", 40, 15, 1, "auto", addGrowth),
+
+  new Upgrade("Farm", 80, 25, 5, "auto", addGrowth),
+];
+
+// Create Upgrade Buttons
+const upgradeButtons: HTMLButtonElement[] = [];
+
+for (const upgrade of upgrades) {
+  const button = document.createElement("button");
+
+  button.addEventListener("click", () => {
+    if (cookieCount < upgrade.cost) return;
+    cookieCount -= upgrade.cost;
+    upgrade.purchase();
+  });
+  upgradeButtons.push(button);
+}
+
 app.append(
   heading,
   image,
   counterText,
-  upgradeClickerButton,
-  document.createElement("br"),
-  upgradeAutoClickerButton,
+  rateText,
+  ...upgradeButtons.flatMap((button) => [button, document.createElement("br")]),
 );
