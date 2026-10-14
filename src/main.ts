@@ -1,30 +1,40 @@
 // Vite turns this import into a production-safe URL. Keep it as a file so
 // even this tiny example demonstrates a separately deployed asset.
 // @deno-types="./asset-url.d.ts"
-import tileUrl from "./assets/tile.svg?no-inline";
+import breadUrl from "./assets/bread.png";
+import breadCutUrl from "./assets/cut bread.png";
+import "./style.css";
 
 const app = document.querySelector<HTMLElement>("#app")!;
 
 const heading = document.createElement("h1");
-heading.textContent = "Cookie Clicker Square Edition";
+heading.textContent = "Bread Clicker Loaf Edition";
 
 // Images
-const image = document.createElement("img");
-image.src = tileUrl;
-image.alt = "A teal tile with a cream circle";
-image.width = 96;
-image.height = 96;
+const breadImage = document.createElement("img");
+breadImage.src = breadUrl;
+breadImage.alt = "A loaf of bread";
+breadImage.width = 96;
+breadImage.height = 96;
+
+breadImage.addEventListener("mousedown", () => {
+  breadImage.src = breadCutUrl;
+});
+
+breadImage.addEventListener("mouseup", () => {
+  breadImage.src = breadUrl;
+});
 
 const rateText = document.createElement("p");
 const counterText = document.createElement("p");
-counterText.textContent = "Cookies: 0";
+counterText.textContent = "Bread Slices: 0";
 
 // Update Display
 function updateDisplay() {
-  counterText.textContent = `Cookies: ${Math.floor(cookieCount)}`;
+  counterText.textContent = `Bread Slices: ${Math.floor(breadCount)}`;
   rateText.textContent = `${
-    cookiesPerSecond.toFixed(1)
-  } cookies/sec | ${cookiesPerClick} cookies per click`;
+    slicesPerSecond.toFixed(1)
+  } Bread Slices/sec | ${slicesPerClick} Bread Slices per click`;
 
   // Button text
   for (let i = 0; i < upgrades.length; i++) {
@@ -32,21 +42,21 @@ function updateDisplay() {
     const button = upgradeButtons[i];
 
     button.textContent =
-      `${upgrade.owned}x ${upgrade.name} | +${upgrade.amountPerUpgrade} C/${upgrade.upgradeType} | (cost: ${upgrade.cost} cookies)`;
-    button.disabled = !upgrade.canPurchase(cookieCount);
+      `${upgrade.owned}x ${upgrade.name} | +${upgrade.amountPerUpgrade} C/${upgrade.upgradeType} | (cost: ${upgrade.cost} Bread Slices)`;
+    button.disabled = !upgrade.canPurchase(breadCount);
   }
 }
 
 // Update Growth Rate
-let cookiesPerSecond = 0;
+let slicesPerSecond = 0;
 function addGrowth(amount: number) {
-  cookiesPerSecond += amount;
+  slicesPerSecond += amount;
 }
 
 // Update Click Power
-let cookiesPerClick = 1;
+let slicesPerClick = 1;
 function addClickPower(amount: number) {
-  cookiesPerClick += amount;
+  slicesPerClick += amount;
 }
 
 // Timed Growth
@@ -54,7 +64,7 @@ let lastFrameTime = performance.now(); // Time stamp of previous frame
 function tick(now: number) {
   const elapsedTime = (now - lastFrameTime) / 1000; // time (sec) between frames
   lastFrameTime = now;
-  cookieCount += cookiesPerSecond * elapsedTime;
+  breadCount += slicesPerSecond * elapsedTime;
   updateDisplay();
 
   requestAnimationFrame(tick); // inside: schedules the next frame
@@ -62,9 +72,9 @@ function tick(now: number) {
 requestAnimationFrame(tick); // outside: starts the loop
 
 // Clicker Section
-let cookieCount = 0;
-image.addEventListener("click", () => {
-  cookieCount += cookiesPerClick;
+let breadCount = 0;
+breadImage.addEventListener("click", () => {
+  breadCount += slicesPerClick;
   updateDisplay();
 });
 
@@ -90,18 +100,21 @@ class Upgrade {
     this.applyEffect(this.amountPerUpgrade);
   }
 
-  canPurchase(cookies: number): boolean {
-    return cookies >= this.cost;
+  canPurchase(slices: number): boolean {
+    return slices >= this.cost;
   }
 }
 
 // Upgrade data
+
 const upgrades: Upgrade[] = [
-  new Upgrade("Clicker", 20, 15, 1, "click", addClickPower),
+  new Upgrade("Knife Upgrade🔪", 20, 15, 1, "click", addClickPower),
 
-  new Upgrade("AutoClicker", 40, 15, 1, "second", addGrowth),
+  new Upgrade("AutoCutter Upgrade🔪🔪", 40, 15, 1, "second", addGrowth),
 
-  new Upgrade("Farm", 80, 25, 5, "second", addGrowth),
+  new Upgrade("Bread Workers🧑‍🏭🧑‍🏭", 80, 25, 5, "second", addGrowth),
+
+  new Upgrade("Bread Factory🍞🏭", 150, 150, 40, "second", addGrowth),
 ];
 
 // Create Upgrade Buttons
@@ -111,8 +124,8 @@ for (const upgrade of upgrades) {
   const button = document.createElement("button");
 
   button.addEventListener("click", () => {
-    if (cookieCount < upgrade.cost) return;
-    cookieCount -= upgrade.cost;
+    if (!upgrade.canPurchase(breadCount)) return;
+    breadCount -= upgrade.cost;
     upgrade.purchase();
   });
   upgradeButtons.push(button);
@@ -120,7 +133,7 @@ for (const upgrade of upgrades) {
 
 app.append(
   heading,
-  image,
+  breadImage,
   counterText,
   rateText,
   ...upgradeButtons.flatMap((button) => [button, document.createElement("br")]),
