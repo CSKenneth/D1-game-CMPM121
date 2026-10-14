@@ -6,7 +6,7 @@ import tileUrl from "./assets/tile.svg?no-inline";
 const app = document.querySelector<HTMLElement>("#app")!;
 
 const heading = document.createElement("h1");
-heading.textContent = "D1 project";
+heading.textContent = "Cookie Clicker Square Edition";
 
 const image = document.createElement("img");
 image.src = tileUrl;
@@ -15,6 +15,6 @@ image.width = 96;
 image.height = 96;
 
 const message = document.createElement("p");
-message.textContent = "Your project starts here.";
+message.textContent = "Cookies: 0";
 
 app.append(heading, image, message);
