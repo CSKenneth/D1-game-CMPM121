@@ -25,6 +25,10 @@ breadImage.addEventListener("mouseup", () => {
   breadImage.src = breadUrl;
 });
 
+breadImage.addEventListener("mouseleave", () => {
+  breadImage.src = breadUrl;
+});
+
 const rateText = document.createElement("p");
 const counterText = document.createElement("p");
 counterText.textContent = "Bread Slices: 0";
@@ -42,7 +46,7 @@ function updateDisplay() {
     const button = upgradeButtons[i];
 
     button.textContent =
-      `${upgrade.owned}x ${upgrade.name} | +${upgrade.amountPerUpgrade} C/${upgrade.upgradeType} | (cost: ${upgrade.cost} Bread Slices)`;
+      `${upgrade.owned}x ${upgrade.name} | +${upgrade.amountPerUpgrade} S/${upgrade.upgradeType} | (cost: ${upgrade.cost} Bread Slices)`;
     button.disabled = !upgrade.canPurchase(breadCount);
   }
 }
@@ -106,7 +110,6 @@ class Upgrade {
 }
 
 // Upgrade data
-
 const upgrades: Upgrade[] = [
   new Upgrade("Knife Upgrade🔪", 20, 15, 1, "click", addClickPower),
 
