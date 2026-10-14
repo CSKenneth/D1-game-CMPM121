@@ -8,6 +8,7 @@ const app = document.querySelector<HTMLElement>("#app")!;
 const heading = document.createElement("h1");
 heading.textContent = "Cookie Clicker Square Edition";
 
+//images
 const image = document.createElement("img");
 image.src = tileUrl;
 image.alt = "A teal tile with a cream circle";
@@ -16,5 +17,13 @@ image.height = 96;
 
 const message = document.createElement("p");
 message.textContent = "Cookies: 0";
+
+//Clicker Section
+let cookieCount = 0;
+
+image.addEventListener("click", () => {
+  cookieCount++;
+  message.textContent = `Cookies: ${cookieCount}`;
+});
 
 app.append(heading, image, message);
