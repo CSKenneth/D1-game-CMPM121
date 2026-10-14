@@ -15,15 +15,25 @@ image.alt = "A teal tile with a cream circle";
 image.width = 96;
 image.height = 96;
 
-const message = document.createElement("p");
-message.textContent = "Cookies: 0";
+const counterText = document.createElement("p");
+counterText.textContent = "Cookies: 0";
+
+// Updates
+function updateDisplay() {
+  counterText.textContent = `Cookies: ${cookieCount}`;
+}
+
+// Timed Growth
+setInterval(() => {
+  cookieCount++;
+  updateDisplay();
+}, 1000);
 
 //Clicker Section
 let cookieCount = 0;
-
 image.addEventListener("click", () => {
   cookieCount++;
-  message.textContent = `Cookies: ${cookieCount}`;
+  updateDisplay();
 });
 
-app.append(heading, image, message);
+app.append(heading, image, counterText);
