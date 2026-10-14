@@ -118,6 +118,8 @@ const upgrades: Upgrade[] = [
   new Upgrade("Bread Workers🧑‍🏭🧑‍🏭", 80, 25, 5, "second", addGrowth),
 
   new Upgrade("Bread Factory🍞🏭", 150, 150, 40, "second", addGrowth),
+
+  new Upgrade("Bread Monopoly🎩🧐", 400, 600, 120, "second", addGrowth),
 ];
 
 // Create Upgrade Buttons
